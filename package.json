@@ -18,7 +18,6 @@
     "@inkdropapp/base-ui-theme": "^0.3.0",
     "@inkdropapp/css": "^0.4.2",
     "commander": "^12.1.0",
-    "debug": "^4.3.7",
     "puppeteer": "^23.5.3"
   }
 }
