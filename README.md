@@ -24,18 +24,15 @@ generate-palette [options] <theme-name>
 
 ### Parameters
 
-You can specify a different theme package name and output destination using the following options:
+You can specify the following options:
 
-- `<theme-name>`: The name of the theme package to extract variables from. Required. (e.g.,: `default-light-ui`).
 - `-a, --appearance <light/dark>`: Force the UI appearance ("light" or "dark")
 - `-o, --output`: The file path where the extracted variables will be saved (default: `./palette.json`).
 
-### Examples
+### Example
+
+If your theme package name doesn't include 'dark' but it is a dark mode:
 
 ```sh
-generate-palette default-light-ui
-```
-
-```sh
-generate-palette nord-ui -a dark
+generate-palette -a dark
 ```

@@ -12,19 +12,18 @@ program
   .name('generate-palette')
   .description('CLI tool for extracting CSS variables from a theme package for Inkdrop')
   .version(packageJson.version)
-  .argument('<theme-name>', 'Theme package name (e.g., default-light-ui)')
   .option('-a, --appearance <light/dark>', 'Force the UI appearance ("light" or "dark")')
   .option('-o, --output <path>', 'Output file path (default: ./palette.json)', './palette.json')
   .parse(process.argv);
 
 // Parse options
-const themePackageName = program.args[0] as string;
 const options = program.opts();
 const outputPath = options.output as string;
 const appearance = options.appearance as 'light' | 'dark' | undefined;
 
 // Function to extract theme CSS variables
-async function extractPalette(themePackageName: string, outputPath: string) {
+async function extractPalette(outputPath: string) {
+  const themePackageJson = (await import(path.join(process.cwd(), 'package.json')))
   const themeVariableNames = (await import(`@inkdropapp/base-ui-theme/lib/variable-names.json`)).default;
 
   const browser = await puppeteer.launch();
@@ -46,13 +45,12 @@ async function extractPalette(themePackageName: string, outputPath: string) {
       <link rel="stylesheet" href="node_modules/@inkdropapp/base-ui-theme/styles/theme.css" />
       <link rel="stylesheet" href="styles/theme.css" />
     </head>
-    <body class="${themePackageName} ${typeof appearance !== 'undefined' ? appearance + '-mode' : ''}">
+    <body class="${themePackageJson.name} ${typeof appearance !== 'undefined' ? appearance + '-mode' : ''}">
       <h1>Hello</h1>
     </body>
   </html>
   `;
 
-  console.log(content)
   await page.goto(baseUrl);
   await page.setContent(content);
 
@@ -80,6 +78,6 @@ async function extractPalette(themePackageName: string, outputPath: string) {
   await browser.close();
 }
 
-extractPalette(themePackageName, outputPath)
+extractPalette(outputPath)
   .then(() => console.log('Palette extraction complete!'))
   .catch(err => console.error('Error extracting palette:', err));
