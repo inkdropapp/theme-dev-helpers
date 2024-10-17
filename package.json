@@ -1,12 +1,14 @@
 {
   "name": "@inkdropapp/theme-dev-helpers",
   "version": "0.2.2",
+  "type": "module",
   "description": "A helper module for creating themes for Inkdrop",
   "keywords": [
     "inkdrop",
     "markdown"
   ],
   "scripts": {
+    "dev-server": "bunx --bun vite",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -21,7 +23,19 @@
   "dependencies": {
     "@inkdropapp/base-ui-theme": "^0.3.1",
     "@inkdropapp/css": "^0.4.2",
+    "@types/react": "^18.3.10",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.2",
     "commander": "^12.1.0",
-    "puppeteer": "^23.5.3"
+    "puppeteer": "^23.5.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.27.0",
+    "typescript": "^5.5.3",
+    "typescript-eslint": "^8.7.0",
+    "vite": "^5.4.8"
+  },
+  "devDependencies": {
+    "prettier": "^3.3.3"
   }
 }
