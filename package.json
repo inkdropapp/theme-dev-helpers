@@ -9,6 +9,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/inkdropapp/theme-dev-helpers.git"
+  },
   "author": "Takuya Matsuyama<t@inkdrop.app>",
   "license": "MIT",
   "bin": {
