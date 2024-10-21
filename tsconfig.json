@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
+    "target": "ESNext",
     "useDefineForClassFields": true,
     "lib": [
       "ES2020",
@@ -10,7 +10,7 @@
     "module": "ESNext",
     "skipLibCheck": true,
     /* Bundler mode */
-    "moduleResolution": "bundler",
+    "moduleResolution": "Node",
     "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "moduleDetection": "force",
