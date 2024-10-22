@@ -6,21 +6,18 @@ import "./dev-server.css";
 import "@inkdropapp/css/reset.css";
 import "@inkdropapp/css/tokens.css";
 import "@inkdropapp/base-ui-theme/styles/theme.css";
-import "@/styles/tokens.css";
-import "@/styles/theme.css";
 
 import { ColorTokensPage } from "./dev-server/color-tokens";
 import { VariablesPage } from "./dev-server/variables";
 import { ComponentsPage } from "./dev-server/components";
+const baseProjectPath = import.meta.env.BASE_PROJECT_PATH || ''
+const styleSheets: string[] = import.meta.env.STYLE_SHEETS || []
 
-// const cssFiles = [
-//   "@/styles/tokens.css",
-//   "@/styles/theme.css",
-// ];
-//
-// cssFiles.forEach((file) => {
-//   import(/* @vite-ignore */ file);
-// });
+const cssFiles = styleSheets.map(ss => `${baseProjectPath}/styles/${ss}`)
+
+cssFiles.forEach((file) => {
+  import(file);
+});
 
 const router = createBrowserRouter([
   {
