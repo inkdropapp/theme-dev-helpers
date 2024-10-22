@@ -24,6 +24,8 @@ export default defineConfig({
     ]
   },
   define: {
+    'import.meta.env.THEME_NAME': JSON.stringify(packageJson.name),
+    'import.meta.env.THEME_APPEARANCE': JSON.stringify(packageJson.themeAppearance),
     'import.meta.env.BASE_PROJECT_PATH': JSON.stringify(baseProjectPath),
     'import.meta.env.STYLE_SHEETS': JSON.stringify(styleSheets)
   },
