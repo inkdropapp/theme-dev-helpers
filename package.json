@@ -8,7 +8,6 @@
     "markdown"
   ],
   "scripts": {
-    "dev-server": "bunx --bun vite",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -18,7 +17,8 @@
   "author": "Takuya Matsuyama<t@inkdrop.app>",
   "license": "MIT",
   "bin": {
-    "generate-palette": "./bin/generate-palette"
+    "generate-palette": "./bin/generate-palette",
+    "dev-server": "./bin/dev-server"
   },
   "dependencies": {
     "@inkdropapp/base-ui-theme": "^0.3.1",
