@@ -36,3 +36,12 @@ If your theme package name doesn't include 'dark' but it is a dark mode:
 ```sh
 generate-palette -a dark
 ```
+
+## Run dev server
+
+It provides a simple UI to preview your theme with hot-reloading.
+
+```sh
+dev-server
+```
+
