@@ -24,7 +24,7 @@ const appearance = options.appearance as 'light' | 'dark' | undefined;
 // Function to extract theme CSS variables
 async function extractPalette(outputPath: string) {
   const themePackageJson = (await import(path.join(process.cwd(), 'package.json')))
-  const themeVariableNames = (await import(`@inkdropapp/base-ui-theme/lib/variable-names.json`)).default;
+  const themeVariableNames: string[] = (await import(`@inkdropapp/base-ui-theme/lib/variable-names.json`)).default;
 
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
@@ -61,7 +61,7 @@ async function extractPalette(outputPath: string) {
   // Extract CSS variables
   const computedCSSVariables = await page.$eval('body', (body) => {
     const computedStyles = body.computedStyleMap();
-    const variables = {};
+    const variables: Record<string, string> = {};
     for (const [prop, val] of computedStyles) {
       if (prop.startsWith('--')) {
         variables[prop] = val.toString();
@@ -73,7 +73,7 @@ async function extractPalette(outputPath: string) {
   const themeCSSVariables = themeVariableNames.reduce((variables, name) => {
     variables[name] = computedCSSVariables[name];
     return variables;
-  }, {});
+  }, {} as Record<string, string>);
 
   // Write to the output file
   const outputFilePath = path.resolve(outputPath);

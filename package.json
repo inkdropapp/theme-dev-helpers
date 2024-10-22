@@ -1,6 +1,7 @@
 {
   "name": "@inkdropapp/theme-dev-helpers",
-  "version": "0.2.2",
+  "version": "0.3.2",
+  "type": "module",
   "description": "A helper module for creating themes for Inkdrop",
   "keywords": [
     "inkdrop",
@@ -16,12 +17,25 @@
   "author": "Takuya Matsuyama<t@inkdrop.app>",
   "license": "MIT",
   "bin": {
-    "generate-palette": "./bin/generate-palette"
+    "generate-palette": "./bin/generate-palette",
+    "dev-server": "./bin/dev-server"
   },
   "dependencies": {
     "@inkdropapp/base-ui-theme": "^0.3.1",
     "@inkdropapp/css": "^0.4.2",
+    "@vitejs/plugin-react": "^4.3.2",
     "commander": "^12.1.0",
-    "puppeteer": "^23.5.3"
+    "puppeteer": "^23.5.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.27.0",
+    "typescript": "^5.5.3",
+    "vite": "^5.4.8"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.10",
+    "@types/react-dom": "^18.3.0",
+    "typescript-eslint": "^8.7.0",
+    "prettier": "^3.3.3"
   }
 }
