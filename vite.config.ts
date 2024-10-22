@@ -1,13 +1,15 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { readFile } from 'fs/promises'
 
 const baseProjectPath = process.env.BASE_PROJECT_PATH || process.cwd()
 console.log('Base project path:', baseProjectPath)
-const packageJson = await import(`${baseProjectPath}/package.json`, {
-  with: {
-    type: "json",
-  }
-})
+const packageJson = JSON.parse(
+  await readFile(
+    `${baseProjectPath}/package.json`,
+    { encoding: 'utf-8' }
+  )
+);
 const { styleSheets } = packageJson
 
 // https://vitejs.dev/config/
