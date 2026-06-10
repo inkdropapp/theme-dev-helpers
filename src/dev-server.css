@@ -17,7 +17,7 @@ h2 {
   justify-content: center;
   gap: 0.6rem;
 
-  &>.variable-item {
+  & > .variable-item {
     display: flex;
     flex-direction: row;
     gap: 0.6em;
@@ -38,7 +38,6 @@ h2 {
       }
     }
   }
-
 }
 
 .nav {

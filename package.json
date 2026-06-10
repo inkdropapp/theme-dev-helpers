@@ -1,41 +1,44 @@
 {
   "name": "@inkdropapp/theme-dev-helpers",
   "version": "0.3.7",
-  "type": "module",
   "description": "A helper module for creating themes for Inkdrop",
   "keywords": [
     "inkdrop",
     "markdown"
   ],
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "license": "MIT",
+  "author": "Takuya Matsuyama<t@inkdrop.app>",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/inkdropapp/theme-dev-helpers.git"
   },
-  "author": "Takuya Matsuyama<t@inkdrop.app>",
-  "license": "MIT",
   "bin": {
-    "generate-palette": "./bin/generate-palette",
-    "dev-server": "./bin/dev-server"
+    "dev-server": "./bin/dev-server",
+    "generate-palette": "./bin/generate-palette"
+  },
+  "type": "module",
+  "scripts": {
+    "format": "oxfmt",
+    "lint": "oxlint",
+    "typecheck": "tsc --noEmit",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "@inkdropapp/base-ui-theme": "^0.3.2",
-    "@inkdropapp/css": "^0.4.2",
-    "@vitejs/plugin-react": "^4.3.2",
-    "commander": "^12.1.0",
-    "puppeteer": "^23.5.3",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-router-dom": "^6.27.0",
-    "typescript": "^5.6.3",
-    "vite": "^5.4.8"
+    "@inkdropapp/base-ui-theme": "^0.7.3",
+    "@inkdropapp/css": "^0.6.3",
+    "@vitejs/plugin-react": "^6.0.2",
+    "commander": "^15.0.0",
+    "puppeteer": "^25.1.0",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "react-router-dom": "^7.17.0",
+    "typescript": "^6.0.3",
+    "vite": "^8.0.16"
   },
   "devDependencies": {
-    "@types/react": "^18.3.10",
-    "@types/react-dom": "^18.3.0",
-    "typescript-eslint": "^8.7.0",
-    "prettier": "^3.3.3"
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "oxfmt": "0.54.0",
+    "oxlint": "1.69.0"
   }
 }

@@ -44,4 +44,3 @@ It provides a simple UI to preview your theme with hot-reloading.
 ```sh
 dev-server
 ```
-

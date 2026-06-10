@@ -6,18 +6,19 @@ export const VariablesPage = () => {
   return (
     <>
       <h2>Variables</h2>
-      <div className='variable-list'>
-        {themeVariableNames.map(variableName => {
+      <div className="variable-list">
+        {themeVariableNames.map((variableName) => {
           return (
-            <div key={variableName} className='variable-item'>
-              <div className='color-box' style={{
-                background: `var(${variableName})`
-              }}></div>
-              <div className='data'>
-                <div className='variable-name'>{variableName}</div>
-                <div className='variable-value'>
-                  {cssVariables[variableName]}
-                </div>
+            <div key={variableName} className="variable-item">
+              <div
+                className="color-box"
+                style={{
+                  background: `var(${variableName})`
+                }}
+              ></div>
+              <div className="data">
+                <div className="variable-name">{variableName}</div>
+                <div className="variable-value">{cssVariables[variableName]}</div>
               </div>
             </div>
           )
@@ -26,4 +27,3 @@ export const VariablesPage = () => {
     </>
   )
 }
-

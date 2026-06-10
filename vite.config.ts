@@ -5,11 +5,8 @@ import { readFile } from 'fs/promises'
 const baseProjectPath = process.env.BASE_PROJECT_PATH || process.cwd()
 console.log('Base project path:', baseProjectPath)
 const packageJson = JSON.parse(
-  await readFile(
-    `${baseProjectPath}/package.json`,
-    { encoding: 'utf-8' }
-  )
-);
+  await readFile(`${baseProjectPath}/package.json`, { encoding: 'utf-8' })
+)
 const { styleSheets } = packageJson
 
 // https://vitejs.dev/config/
@@ -35,6 +32,12 @@ export default defineConfig({
     }
   },
   optimizeDeps: {
-    include: ['react', 'react-dom', 'react-dom/client', 'react/jsx-dev-runtime', 'react/jsx-runtime']
+    include: [
+      'react',
+      'react-dom',
+      'react-dom/client',
+      'react/jsx-dev-runtime',
+      'react/jsx-runtime'
+    ]
   }
 })
