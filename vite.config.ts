@@ -27,6 +27,9 @@ export default defineConfig({
     'import.meta.env.STYLE_SHEETS': JSON.stringify(styleSheets)
   },
   server: {
+    host: '127.0.0.1',
+    port: Number(process.env.PORT) || 5180,
+    strictPort: false,
     fs: {
       strict: false
     }

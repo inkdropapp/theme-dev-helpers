@@ -18,7 +18,7 @@ const styleSheets: string[] = import.meta.env.STYLE_SHEETS || []
 const cssFiles = styleSheets.map((ss) => `${baseProjectPath}/styles/${ss}`)
 
 cssFiles.forEach((file) => {
-  import(file)
+  import(/* @vite-ignore */ file)
 })
 
 document.body.classList.add(`theme-${themePackageName}`)
