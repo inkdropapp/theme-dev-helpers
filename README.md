@@ -44,3 +44,15 @@ It provides a simple UI to preview your theme with hot-reloading.
 ```sh
 dev-server
 ```
+
+## Development
+
+Dependencies are managed with [pnpm](https://pnpm.io/), and [Bun](https://bun.sh/) is the runtime used to run the CLIs and tests.
+
+```sh
+pnpm install      # install dependencies
+pnpm format       # format with oxfmt
+pnpm lint         # lint with oxlint
+pnpm typecheck    # type-check with tsc
+pnpm test         # run unit tests (bun test)
+```

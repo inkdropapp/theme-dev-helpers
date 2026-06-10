@@ -4,6 +4,7 @@ import path from 'path'
 import { pathToFileURL } from 'url'
 import { Command } from 'commander'
 import packageJson from '../package.json'
+import { buildPreviewHTML, mapThemeVariables } from './palette'
 
 const program = new Command()
 
@@ -39,27 +40,8 @@ async function extractPalette(outputPath: string) {
     })
     .on('pageerror', (error) => console.error(error instanceof Error ? error.message : error))
 
-  const themeCSSFiles = (
-    themePackageJson.styleSheets?.map(
-      (filePath: string) => `<link rel="stylesheet" href="styles/${filePath}" />`
-    ) || []
-  ).join('\n')
   const baseUrl = pathToFileURL(process.cwd()).toString() + '/'
-  const content = `<!DOCTYPE html>
-  <html>
-    <head>
-      <base href="${baseUrl}" />
-      <link rel="stylesheet" href="node_modules/@inkdropapp/css/reset.css" />
-      <link rel="stylesheet" href="node_modules/@inkdropapp/css/tokens.css" />
-      <link rel="stylesheet" href="node_modules/@inkdropapp/css/tags.css" />
-      <link rel="stylesheet" href="node_modules/@inkdropapp/base-ui-theme/styles/theme.css" />
-      ${themeCSSFiles}
-    </head>
-    <body class="${themePackageJson.name} ${typeof appearance !== 'undefined' ? appearance + '-mode' : ''}">
-      <h1>Hello</h1>
-    </body>
-  </html>
-  `
+  const content = buildPreviewHTML(themePackageJson, baseUrl, appearance)
 
   await page.goto(baseUrl)
   await page.setContent(content)
@@ -76,13 +58,7 @@ async function extractPalette(outputPath: string) {
     return variables
   })
 
-  const themeCSSVariables = themeVariableNames.reduce(
-    (variables, name) => {
-      variables[name] = computedCSSVariables[name]
-      return variables
-    },
-    {} as Record<string, string>
-  )
+  const themeCSSVariables = mapThemeVariables(themeVariableNames, computedCSSVariables)
 
   // Write to the output file
   const outputFilePath = path.resolve(outputPath)
