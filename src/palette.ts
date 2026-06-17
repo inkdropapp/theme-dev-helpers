@@ -17,12 +17,17 @@ export type ThemeAppearance = 'light' | 'dark'
  * compute a theme's CSS custom properties.
  *
  * It pulls in Inkdrop's base CSS plus the theme's own stylesheets so that the
- * computed style of `<body>` resolves every themed variable. A `<base href>` is
- * emitted so the relative `node_modules/` and `styles/` links resolve against
+ * computed style of `<body>` resolves every themed variable. Inkdrop's base
+ * stylesheets are passed in as already-resolved absolute URLs (they live in
+ * this package's own dependencies, not the theme's), while the theme's own
+ * `styles/` links stay relative and resolve against the `<base href>` — i.e.
  * the theme project root.
  *
  * @param theme - The theme package's metadata (`name`, `styleSheets`).
- * @param baseUrl - File URL used as the document `<base href>`.
+ * @param baseUrl - File URL used as the document `<base href>`; the theme's own
+ *   `styles/` links resolve against it.
+ * @param baseStyleSheetURLs - Absolute URLs of Inkdrop's base stylesheets,
+ *   resolved from this package's dependency graph by the caller.
  * @param appearance - Optional forced appearance; adds a `<appearance>-mode`
  *   body class when provided.
  * @returns The full HTML document as a string.
@@ -30,8 +35,13 @@ export type ThemeAppearance = 'light' | 'dark'
 export function buildPreviewHTML(
   theme: ThemePackage,
   baseUrl: string,
+  baseStyleSheetURLs: string[],
   appearance?: ThemeAppearance
 ): string {
+  const baseCSSLinks = baseStyleSheetURLs
+    .map((href) => `<link rel="stylesheet" href="${href}" />`)
+    .join('\n')
+
   const themeCSSLinks = (theme.styleSheets ?? [])
     .map((filePath) => `<link rel="stylesheet" href="styles/${filePath}" />`)
     .join('\n')
@@ -42,10 +52,7 @@ export function buildPreviewHTML(
   <html>
     <head>
       <base href="${baseUrl}" />
-      <link rel="stylesheet" href="node_modules/@inkdropapp/css/reset.css" />
-      <link rel="stylesheet" href="node_modules/@inkdropapp/css/tokens.css" />
-      <link rel="stylesheet" href="node_modules/@inkdropapp/css/tags.css" />
-      <link rel="stylesheet" href="node_modules/@inkdropapp/base-ui-theme/styles/theme.css" />
+      ${baseCSSLinks}
       ${themeCSSLinks}
     </head>
     <body class="${bodyClass}">

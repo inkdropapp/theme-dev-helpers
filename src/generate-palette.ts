@@ -22,6 +22,15 @@ const options = program.opts()
 const outputPath = options.output as string
 const appearance = options.appearance as 'light' | 'dark' | undefined
 
+const baseStyleSheetSpecifiers = [
+  '@inkdropapp/css/reset.css',
+  '@inkdropapp/css/tokens.css',
+  '@inkdropapp/css/ui.css',
+  '@inkdropapp/css/tags.css',
+  '@inkdropapp/css/status.css',
+  '@inkdropapp/base-ui-theme/styles/theme.css'
+]
+
 // Function to extract theme CSS variables
 async function extractPalette(outputPath: string) {
   const themePackageJson = await import(path.join(process.cwd(), 'package.json'))
@@ -39,7 +48,8 @@ async function extractPalette(outputPath: string) {
     .on('pageerror', (error) => console.error(error instanceof Error ? error.message : error))
 
   const baseUrl = pathToFileURL(process.cwd()).toString() + '/'
-  const content = buildPreviewHTML(themePackageJson, baseUrl, appearance)
+  const baseStyleSheetURLs = baseStyleSheetSpecifiers.map((spec) => import.meta.resolve(spec))
+  const content = buildPreviewHTML(themePackageJson, baseUrl, baseStyleSheetURLs, appearance)
 
   await page.goto(baseUrl)
   await page.setContent(content)

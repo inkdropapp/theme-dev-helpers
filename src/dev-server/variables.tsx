@@ -1,4 +1,4 @@
-import themeVariableNames from '@inkdropapp/base-ui-theme/lib/variable-names.json'
+import themeVariableNames from '@inkdropapp/css/ui.json'
 import { getCSSVariables } from './get-css-variables'
 
 export const VariablesPage = () => {
