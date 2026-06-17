@@ -25,9 +25,7 @@ const appearance = options.appearance as 'light' | 'dark' | undefined
 // Function to extract theme CSS variables
 async function extractPalette(outputPath: string) {
   const themePackageJson = await import(path.join(process.cwd(), 'package.json'))
-  const themeVariableNames: string[] = (
-    await import(`@inkdropapp/base-ui-theme/lib/variable-names.json`)
-  ).default
+  const themeVariableNames: string[] = (await import(`@inkdropapp/css/ui.json`)).default
 
   const browser = await puppeteer.launch()
   const page = await browser.newPage()

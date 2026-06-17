@@ -9,11 +9,11 @@ importers:
   .:
     dependencies:
       '@inkdropapp/base-ui-theme':
-        specifier: ^0.7.3
-        version: 0.7.3
+        specifier: ^0.7.5
+        version: 0.7.5
       '@inkdropapp/css':
-        specifier: ^0.6.3
-        version: 0.6.3
+        specifier: ^0.6.7
+        version: 0.6.7
       '@vitejs/plugin-react':
         specifier: ^6.0.2
         version: 6.0.2(vite@8.0.16(@types/node@25.9.3))
@@ -66,11 +66,11 @@ packages:
   '@emnapi/wasi-threads@1.2.1':
     resolution: {integrity: sha512-uTII7OYF+/Mes/MrcIOYp5yOtSMLBWSIoLPpcgwipoiKbli6k322tcoFsxoIIxPDqW01SQGAgko4EzZi2BNv2w==}
 
-  '@inkdropapp/base-ui-theme@0.7.3':
-    resolution: {integrity: sha512-DOxeTjF0JgUAL6vxhKHDyW0otoc+kKtwWmx264CAPfMxocKpBDhKqVbt015+p/vTuGcSrR6F1BmoY/Lxq2NpQg==}
+  '@inkdropapp/base-ui-theme@0.7.5':
+    resolution: {integrity: sha512-HaUJhxSv1G2WSAPTaDqVjU0f5Uk9zClFGc4N0oILLWRdlwFuM9hfrsFT4Vn4IVhHnPzoeqZrNj3gLF0Yx0VqFA==}
 
-  '@inkdropapp/css@0.6.3':
-    resolution: {integrity: sha512-zcv/Y9VyFC1DPkPC7oUEddHLpbuOzdXyDYKooRdZAla6nEU3iYrZx/e6Sn3BOFEfGLER/oqguUckSaLHJiBfjQ==}
+  '@inkdropapp/css@0.6.7':
+    resolution: {integrity: sha512-U0XMHnrQ4u7whjHbGT1x4NBcbsm1Q07DNRK5SrCn4RJtPOQouOAnw6ilLXBlz2pnlTA3+hM4sX8iG8gL8wd8uw==}
 
   '@napi-rs/wasm-runtime@1.1.5':
     resolution: {integrity: sha512-AWPoBRJ9tsnVhor4sjO7rkni+7p+2IAEFj6cx06UgP10jkQHqay/36uRV/bFkgrh18D9vb4cr8Q0Pthskgzy+Q==}
@@ -847,9 +847,9 @@ snapshots:
       tslib: 2.8.1
     optional: true
 
-  '@inkdropapp/base-ui-theme@0.7.3': {}
+  '@inkdropapp/base-ui-theme@0.7.5': {}
 
-  '@inkdropapp/css@0.6.3':
+  '@inkdropapp/css@0.6.7':
     optionalDependencies:
       inkdrop-model: 2.11.5
 

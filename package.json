@@ -24,8 +24,8 @@
     "test": "bun test"
   },
   "dependencies": {
-    "@inkdropapp/base-ui-theme": "^0.7.3",
-    "@inkdropapp/css": "^0.6.3",
+    "@inkdropapp/base-ui-theme": "^0.7.5",
+    "@inkdropapp/css": "^0.6.7",
     "@vitejs/plugin-react": "^6.0.2",
     "commander": "^15.0.0",
     "puppeteer": "^25.1.0",
