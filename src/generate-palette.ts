@@ -28,6 +28,7 @@ const baseStyleSheetSpecifiers = [
   '@inkdropapp/css/ui.css',
   '@inkdropapp/css/tags.css',
   '@inkdropapp/css/status.css',
+  '@inkdropapp/css/task-progress.css',
   '@inkdropapp/base-ui-theme/styles/theme.css'
 ]
 
