@@ -16,12 +16,22 @@
     "dev-server": "./bin/dev-server",
     "generate-palette": "./bin/generate-palette"
   },
+  "files": [
+    "bin",
+    "dist",
+    "src",
+    "index.html",
+    "vite.config.ts",
+    "tsconfig.json"
+  ],
   "type": "module",
   "scripts": {
+    "build": "tsdown",
     "format": "oxfmt",
     "lint": "oxlint",
     "typecheck": "tsc --noEmit",
-    "test": "bun test"
+    "test": "vitest run",
+    "prepare": "pnpm run build"
   },
   "dependencies": {
     "@inkdropapp/base-ui-theme": "^0.7.5",
@@ -36,10 +46,15 @@
     "vite": "^8.0.16"
   },
   "devDependencies": {
-    "@types/bun": "1.3.14",
+    "@types/node": "^25.9.3",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "oxfmt": "0.55.0",
-    "oxlint": "1.70.0"
+    "oxlint": "1.70.0",
+    "tsdown": "^0.22.3",
+    "vitest": "^4.1.9"
+  },
+  "engines": {
+    "node": ">=24"
   }
 }

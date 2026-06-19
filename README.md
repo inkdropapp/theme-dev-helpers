@@ -4,14 +4,14 @@ A helper module for creating themes for Inkdrop.
 
 ## Requirements
 
-- [Bun](https://bun.sh/)
+- [Node.js](https://nodejs.org/) >= 24
 
 ## Installation
 
 You can install the `@inkdropapp/theme-dev-helpers` in your theme project:
 
 ```bash
-bun i -D @inkdropapp/theme-dev-helpers
+npm install --save-dev @inkdropapp/theme-dev-helpers
 ```
 
 ## Generate Palette
@@ -47,12 +47,13 @@ dev-server
 
 ## Development
 
-Dependencies are managed with [pnpm](https://pnpm.io/), and [Bun](https://bun.sh/) is the runtime used to run the CLIs and tests.
+Dependencies are managed with [pnpm](https://pnpm.io/) and the runtime is [Node.js](https://nodejs.org/) (>= 24). The `generate-palette` CLI is bundled to plain JS in `dist/` with [tsdown](https://tsdown.dev/) (Node can't run a dependency's `.ts` files from `node_modules`); `pnpm install` builds it automatically via the `prepare` script. The `dev-server` CLI is served straight from source by Vite.
 
 ```sh
-pnpm install      # install dependencies
+pnpm install      # install dependencies (also builds dist/ via prepare)
+pnpm build        # bundle the generate-palette CLI to dist/ with tsdown
 pnpm format       # format with oxfmt
 pnpm lint         # lint with oxlint
 pnpm typecheck    # type-check with tsc
-pnpm test         # run unit tests (bun test)
+pnpm test         # run unit tests (Vitest)
 ```

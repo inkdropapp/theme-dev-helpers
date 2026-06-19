@@ -1,2 +1,2 @@
-#!/usr/bin/env bun
-import '../src/generate-palette.ts'
+#!/usr/bin/env node
+import '../dist/generate-palette.mjs'

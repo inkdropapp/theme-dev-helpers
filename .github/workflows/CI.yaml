@@ -12,16 +12,29 @@ jobs:
       - name: Checkout 🛎️
         uses: actions/checkout@v6
 
-      - name: Use Bun 🥟
-        uses: oven-sh/setup-bun@v2
+      - name: Setup pnpm 📦
+        uses: pnpm/action-setup@v6
         with:
+          version: 11
+
+      - name: Use Node.js 🟢
+        uses: actions/setup-node@v6
+        with:
+          node-version: '26'
           registry-url: 'https://registry.npmjs.org'
           scope: '@inkdropapp'
+          cache: 'pnpm'
 
       - name: Install 🔧
         env:
-          BUN_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
-        run: bun install
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+        run: pnpm install
+
+      - name: Build 🛠️
+        run: pnpm build
+
+      - name: Test 🧪
+        run: pnpm test
 
       - name: Generate Palette 🏗️
         run: ./bin/generate-palette

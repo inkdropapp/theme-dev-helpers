@@ -3,8 +3,13 @@ import { writeFile } from 'fs/promises'
 import path from 'path'
 import { pathToFileURL } from 'url'
 import { Command } from 'commander'
-import packageJson from '../package.json'
-import { buildPreviewHTML, deriveAppearance, mapThemeVariables, resolveLightDark } from './palette'
+import packageJson from '../package.json' with { type: 'json' }
+import {
+  buildPreviewHTML,
+  deriveAppearance,
+  mapThemeVariables,
+  resolveLightDark
+} from './palette.ts'
 
 const program = new Command()
 
@@ -37,8 +42,12 @@ const baseStyleSheetSpecifiers = [
 
 // Function to extract theme CSS variables
 async function extractPalette(outputPath: string) {
-  const themePackageJson = await import(path.join(process.cwd(), 'package.json'))
-  const themeVariableNames: string[] = (await import(`@inkdropapp/css/variables.json`)).default
+  const themePackageJson = (
+    await import(path.join(process.cwd(), 'package.json'), { with: { type: 'json' } })
+  ).default
+  const themeVariableNames: string[] = (
+    await import(`@inkdropapp/css/variables.json`, { with: { type: 'json' } })
+  ).default
 
   const browser = await puppeteer.launch()
   const page = await browser.newPage()
