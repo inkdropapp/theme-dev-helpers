@@ -28,6 +28,10 @@ You can specify the following options:
 
 - `-a, --appearance <light/dark>`: Force the UI appearance ("light" or "dark")
 - `-o, --output`: The file path where the extracted variables will be saved (default: `./palette.json`).
+- `-t, --type <type>`: Force the theme type whose variables to extract. Defaults to the theme package's `"theme"` field. One of:
+  - `ui`: app chrome plus the note status, tags, and task-progress palettes
+  - `syntax`: editor syntax highlighting tokens
+  - `preview`: the rendered Markdown preview
 
 ### Example
 
@@ -35,6 +39,12 @@ If your theme package name doesn't include 'dark' but it is a dark mode:
 
 ```sh
 generate-palette -a dark
+```
+
+To extract the syntax highlighting variables instead of the UI ones:
+
+```sh
+generate-palette -t syntax
 ```
 
 ## Run dev server

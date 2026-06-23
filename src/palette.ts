@@ -12,6 +12,8 @@ export interface ThemePackage {
   /** Explicit appearance declared by the theme (`"light"` | `"dark"`). */
   themeAppearance?: ThemeAppearance
   styleSheets?: string[]
+  /** Theme type declared by the package (`"ui"` | `"syntax"` | `"preview"`). */
+  theme?: string
 }
 
 /**
@@ -75,6 +77,75 @@ export function buildPreviewHTML(
     </body>
   </html>
   `
+}
+
+/**
+ * The categorised CSS variable manifest shipped by `@inkdropapp/css` as
+ * `variables.json`: an object keyed by category (`ui`, `status`, `tags`,
+ * `task-progress`, `markdown`, `syntax`), each mapping to its variable names.
+ */
+export type ThemeVariableManifest = Record<string, string[]>
+
+/** The theme types `generate-palette` can extract variables for. */
+export const THEME_TYPES = ['ui', 'syntax', 'preview'] as const
+
+export type ThemeType = (typeof THEME_TYPES)[number]
+
+/**
+ * Manifest categories contributed by each theme type. A `ui` theme covers the
+ * app chrome (`ui`) plus the note `status`, `tags`, and `task-progress`
+ * palettes; a `syntax` theme covers the editor `syntax` tokens; a `preview`
+ * theme covers the rendered `markdown` preview.
+ */
+const THEME_TYPE_CATEGORIES: Record<ThemeType, string[]> = {
+  ui: ['ui', 'status', 'tags', 'task-progress'],
+  syntax: ['syntax'],
+  preview: ['markdown']
+}
+
+/**
+ * Selects the CSS variable names a given theme type contributes, in
+ * declaration order, from the categorised manifest shipped by `@inkdropapp/css`
+ * 0.7.0+ (which keys `variables.json` by category). Categories missing from the
+ * manifest are skipped so it degrades gracefully across `@inkdropapp/css`
+ * versions.
+ *
+ * @param manifest - The categorised manifest (category -> variable names).
+ * @param type - The theme type whose variables to extract.
+ * @returns The variable names belonging to the type's categories.
+ */
+export function selectVariableNames(manifest: ThemeVariableManifest, type: ThemeType): string[] {
+  return THEME_TYPE_CATEGORIES[type].flatMap((category) => manifest[category] ?? [])
+}
+
+/** Whether `value` is one of the known theme types. */
+function isThemeType(value: string): value is ThemeType {
+  return (THEME_TYPES as readonly string[]).includes(value)
+}
+
+/**
+ * Resolves which theme type's variables to extract. A forced type (the
+ * `--type` flag) wins; otherwise the theme's declared `theme` field is used.
+ *
+ * @param forced - The theme type forced on the CLI, if any.
+ * @param theme - The theme package's metadata.
+ * @returns The resolved theme type.
+ * @throws If no type is forced and the package's `theme` field is missing or
+ *   not one of the known theme types.
+ */
+export function resolveThemeType(forced: ThemeType | undefined, theme: ThemePackage): ThemeType {
+  if (forced) return forced
+  if (theme.theme === undefined) {
+    throw new Error(
+      `The theme package has no "theme" field; pass --type to specify one of: ${THEME_TYPES.join(', ')}.`
+    )
+  }
+  if (!isThemeType(theme.theme)) {
+    throw new Error(
+      `The theme package's "theme" field is "${theme.theme}", not a known theme type; pass --type to specify one of: ${THEME_TYPES.join(', ')}.`
+    )
+  }
+  return theme.theme
 }
 
 /**

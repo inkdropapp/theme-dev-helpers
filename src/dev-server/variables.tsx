@@ -1,5 +1,7 @@
-import themeVariableNames from '@inkdropapp/css/variables.json'
+import themeVariableManifest from '@inkdropapp/css/variables.json'
 import { getCSSVariables } from './get-css-variables'
+
+const themeVariableNames = Object.values(themeVariableManifest).flat()
 
 export const VariablesPage = () => {
   const cssVariables = getCSSVariables()

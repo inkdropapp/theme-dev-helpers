@@ -35,7 +35,7 @@
   },
   "dependencies": {
     "@inkdropapp/base-ui-theme": "^0.7.5",
-    "@inkdropapp/css": "^0.6.8",
+    "@inkdropapp/css": "^0.7.0",
     "@vitejs/plugin-react": "^6.0.2",
     "commander": "^15.0.0",
     "puppeteer": "^25.1.0",

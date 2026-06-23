@@ -1,5 +1,12 @@
 import { describe, expect, test } from 'vitest'
-import { buildPreviewHTML, deriveAppearance, mapThemeVariables, resolveLightDark } from './palette'
+import {
+  buildPreviewHTML,
+  deriveAppearance,
+  mapThemeVariables,
+  resolveLightDark,
+  resolveThemeType,
+  selectVariableNames
+} from './palette'
 
 describe('buildPreviewHTML', () => {
   const baseUrl = 'file:///themes/acme/'
@@ -98,6 +105,62 @@ describe('resolveLightDark', () => {
     const value = 'light-dark(a, b), light-dark(c, d)'
     expect(resolveLightDark(value, 'light')).toBe('a, c')
     expect(resolveLightDark(value, 'dark')).toBe('b, d')
+  })
+})
+
+describe('selectVariableNames', () => {
+  const manifest = {
+    ui: ['--font-name', '--primary-color'],
+    status: ['--note-status-active'],
+    tags: ['--tag-red-text-color'],
+    'task-progress': ['--task-progress-view-border-color'],
+    markdown: ['--gfm-alert-note'],
+    syntax: ['--syntax-comment-color']
+  }
+
+  test('ui covers ui, status, tags, and task-progress in declaration order', () => {
+    expect(selectVariableNames(manifest, 'ui')).toEqual([
+      '--font-name',
+      '--primary-color',
+      '--note-status-active',
+      '--tag-red-text-color',
+      '--task-progress-view-border-color'
+    ])
+  })
+
+  test('syntax covers only the syntax category', () => {
+    expect(selectVariableNames(manifest, 'syntax')).toEqual(['--syntax-comment-color'])
+  })
+
+  test('preview covers only the markdown category', () => {
+    expect(selectVariableNames(manifest, 'preview')).toEqual(['--gfm-alert-note'])
+  })
+
+  test('skips categories absent from the manifest', () => {
+    expect(selectVariableNames({ ui: ['--a'] }, 'ui')).toEqual(['--a'])
+  })
+})
+
+describe('resolveThemeType', () => {
+  test('a forced type wins over the declared one', () => {
+    expect(resolveThemeType('syntax', { theme: 'preview' })).toBe('syntax')
+  })
+
+  test('falls back to the declared theme field when not forced', () => {
+    expect(resolveThemeType(undefined, { theme: 'syntax' })).toBe('syntax')
+    expect(resolveThemeType(undefined, { theme: 'preview' })).toBe('preview')
+  })
+
+  test('throws when neither forced nor declared', () => {
+    expect(() => resolveThemeType(undefined, {})).toThrow(/no "theme" field/)
+  })
+
+  test('throws on an unknown declared theme field', () => {
+    expect(() => resolveThemeType(undefined, { theme: 'bogus' })).toThrow(/not a known theme type/)
+  })
+
+  test('a forced type still wins when the theme field is missing', () => {
+    expect(resolveThemeType('ui', {})).toBe('ui')
   })
 })
 
