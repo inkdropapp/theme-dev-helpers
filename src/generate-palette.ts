@@ -62,7 +62,7 @@ async function extractPalette(outputPath: string) {
   const resolvedType = resolveThemeType(type, themePackageJson)
   const themeVariableNames = selectVariableNames(themeVariableManifest, resolvedType)
 
-  const browser = await puppeteer.launch()
+  const browser = await puppeteer.launch({ args: ['--no-sandbox'] })
   const page = await browser.newPage()
 
   page
