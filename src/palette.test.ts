@@ -4,6 +4,7 @@ import {
   deriveAppearance,
   mapThemeVariables,
   resolveLightDark,
+  resolveProbeSelector,
   resolveThemeType,
   selectVariableNames
 } from './palette'
@@ -55,6 +56,12 @@ describe('buildPreviewHTML', () => {
   test('adds no appearance class when appearance is omitted', () => {
     const html = buildPreviewHTML({ name: 'acme' }, baseUrl, [])
     expect(html).not.toContain('-mode')
+  })
+
+  test('renders .cm-editor and .mde-preview elements so scoped tokens can be probed off them', () => {
+    const html = buildPreviewHTML({ name: 'acme' }, baseUrl, [])
+    expect(html).toContain('<div class="cm-editor">')
+    expect(html).toContain('<div class="mde-preview">')
   })
 })
 
@@ -138,6 +145,20 @@ describe('selectVariableNames', () => {
 
   test('skips categories absent from the manifest', () => {
     expect(selectVariableNames({ ui: ['--a'] }, 'ui')).toEqual(['--a'])
+  })
+})
+
+describe('resolveProbeSelector', () => {
+  test('reads syntax tokens off the editor element they are scoped under', () => {
+    expect(resolveProbeSelector('syntax')).toBe('.cm-editor')
+  })
+
+  test('reads preview tokens off the rendered-markdown element they are scoped under', () => {
+    expect(resolveProbeSelector('preview')).toBe('.mde-preview')
+  })
+
+  test('reads ui tokens off the document body', () => {
+    expect(resolveProbeSelector('ui')).toBe('body')
   })
 })
 

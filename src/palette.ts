@@ -34,11 +34,19 @@ export function deriveAppearance(theme: ThemePackage): ThemeAppearance {
  * compute a theme's CSS custom properties.
  *
  * It pulls in Inkdrop's base CSS plus the theme's own stylesheets so that the
- * computed style of `<body>` resolves every themed variable. Inkdrop's base
- * stylesheets are passed in as already-resolved absolute URLs (they live in
- * this package's own dependencies, not the theme's), while the theme's own
- * `styles/` links stay relative and resolve against the `<base href>` — i.e.
- * the theme project root.
+ * computed style of the probed element (see {@link resolveProbeSelector})
+ * resolves every themed variable. Inkdrop's base stylesheets are passed in as
+ * already-resolved absolute URLs (they live in this package's own dependencies,
+ * not the theme's), while the theme's own `styles/` links stay relative and
+ * resolve against the `<base href>` — i.e. the theme project root.
+ *
+ * The body holds a `.cm-editor` and a `.mde-preview` element so that syntax and
+ * preview extraction can read their scoped tokens off the matching element:
+ * Inkdrop scopes the editor's design tokens under `.cm-editor` and the rendered
+ * markdown's under `.mde-preview`, and a theme may override them there (e.g.
+ * Solarized re-maps the `--hsl-*` ramp under `.cm-editor, .mde-preview
+ * .codeblock`), so those variables resolve to the theme's values inside the
+ * matching element. See {@link resolveProbeSelector}.
  *
  * @param theme - The theme package's metadata (`name`, `styleSheets`).
  * @param baseUrl - File URL used as the document `<base href>`; the theme's own
@@ -73,7 +81,8 @@ export function buildPreviewHTML(
       ${themeCSSLinks}
     </head>
     <body class="${bodyClass}">
-      <h1>Hello</h1>
+      <div class="cm-editor"></div>
+      <div class="mde-preview"></div>
     </body>
   </html>
   `
@@ -116,6 +125,31 @@ const THEME_TYPE_CATEGORIES: Record<ThemeType, string[]> = {
  */
 export function selectVariableNames(manifest: ThemeVariableManifest, type: ThemeType): string[] {
   return THEME_TYPE_CATEGORIES[type].flatMap((category) => manifest[category] ?? [])
+}
+
+/**
+ * The DOM selector whose computed style carries each theme type's CSS
+ * variables. The `ui` tokens live on the document root, so `<body>` resolves
+ * them. The editor (`syntax`) and rendered-markdown (`preview`) tokens are
+ * scoped by Inkdrop under `.cm-editor` and `.mde-preview` respectively, and a
+ * theme can override them there — so they resolve to the theme's values only
+ * inside the matching element.
+ */
+const THEME_TYPE_PROBE_SELECTORS: Record<ThemeType, string> = {
+  ui: 'body',
+  syntax: '.cm-editor',
+  preview: '.mde-preview'
+}
+
+/**
+ * Resolves the selector of the element to read a theme type's computed CSS
+ * variables from in the preview document built by {@link buildPreviewHTML}.
+ *
+ * @param type - The theme type being extracted.
+ * @returns A CSS selector matching an element in the preview document.
+ */
+export function resolveProbeSelector(type: ThemeType): string {
+  return THEME_TYPE_PROBE_SELECTORS[type]
 }
 
 /** Whether `value` is one of the known theme types. */

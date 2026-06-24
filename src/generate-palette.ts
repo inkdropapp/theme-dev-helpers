@@ -9,6 +9,7 @@ import {
   deriveAppearance,
   mapThemeVariables,
   resolveLightDark,
+  resolveProbeSelector,
   resolveThemeType,
   selectVariableNames,
   THEME_TYPES,
@@ -89,8 +90,11 @@ async function extractPalette(outputPath: string) {
   await page.goto(baseUrl)
   await page.setContent(content)
 
-  const computedCSSVariables = await page.$eval('body', (body) => {
-    const computedStyles = body.computedStyleMap()
+  // Syntax/preview tokens are scoped under `.cm-editor` / `.mde-preview`, so read
+  // the computed variables off the element that carries this theme type's values.
+  const probeSelector = resolveProbeSelector(resolvedType)
+  const computedCSSVariables = await page.$eval(probeSelector, (element) => {
+    const computedStyles = element.computedStyleMap()
     const variables: Record<string, string> = {}
     for (const [prop, val] of computedStyles) {
       if (prop.startsWith('--')) {
