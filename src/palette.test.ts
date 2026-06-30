@@ -1,11 +1,10 @@
 import { describe, expect, test } from 'vitest'
 import {
   buildPreviewHTML,
+  buildProbeGroups,
   deriveAppearance,
   mapThemeVariables,
   resolveLightDark,
-  resolveProbeSelector,
-  resolveThemeType,
   selectVariableNames
 } from './palette'
 
@@ -148,40 +147,43 @@ describe('selectVariableNames', () => {
   })
 })
 
-describe('resolveProbeSelector', () => {
-  test('reads syntax tokens off the editor element they are scoped under', () => {
-    expect(resolveProbeSelector('syntax')).toBe('.cm-editor')
+describe('buildProbeGroups', () => {
+  const manifest = {
+    ui: ['--primary-color'],
+    status: ['--note-status-active'],
+    tags: ['--tag-red-text-color'],
+    'task-progress': ['--task-progress-view-border-color'],
+    markdown: ['--gfm-alert-note'],
+    syntax: ['--syntax-comment-color']
+  }
+
+  test('produces one group per surface in ui, syntax, preview merge order', () => {
+    expect(buildProbeGroups(manifest).map((group) => group.type)).toEqual([
+      'ui',
+      'syntax',
+      'preview'
+    ])
   })
 
-  test('reads preview tokens off the rendered-markdown element they are scoped under', () => {
-    expect(resolveProbeSelector('preview')).toBe('.mde-preview')
+  test('pairs each surface with the element its tokens are scoped under', () => {
+    const probesByType = Object.fromEntries(
+      buildProbeGroups(manifest).map((group) => [group.type, group.probeSelector])
+    )
+    expect(probesByType).toEqual({ ui: 'body', syntax: '.cm-editor', preview: '.mde-preview' })
   })
 
-  test('reads ui tokens off the document body', () => {
-    expect(resolveProbeSelector('ui')).toBe('body')
-  })
-})
-
-describe('resolveThemeType', () => {
-  test('a forced type wins over the declared one', () => {
-    expect(resolveThemeType('syntax', { theme: 'preview' })).toBe('syntax')
-  })
-
-  test('falls back to the declared theme field when not forced', () => {
-    expect(resolveThemeType(undefined, { theme: 'syntax' })).toBe('syntax')
-    expect(resolveThemeType(undefined, { theme: 'preview' })).toBe('preview')
-  })
-
-  test('throws when neither forced nor declared', () => {
-    expect(() => resolveThemeType(undefined, {})).toThrow(/no "theme" field/)
-  })
-
-  test('throws on an unknown declared theme field', () => {
-    expect(() => resolveThemeType(undefined, { theme: 'bogus' })).toThrow(/not a known theme type/)
-  })
-
-  test('a forced type still wins when the theme field is missing', () => {
-    expect(resolveThemeType('ui', {})).toBe('ui')
+  test("collects each surface's variable names from its categories", () => {
+    const namesByType = Object.fromEntries(
+      buildProbeGroups(manifest).map((group) => [group.type, group.variableNames])
+    )
+    expect(namesByType.ui).toEqual([
+      '--primary-color',
+      '--note-status-active',
+      '--tag-red-text-color',
+      '--task-progress-view-border-color'
+    ])
+    expect(namesByType.syntax).toEqual(['--syntax-comment-color'])
+    expect(namesByType.preview).toEqual(['--gfm-alert-note'])
   })
 })
 

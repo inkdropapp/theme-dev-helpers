@@ -2,18 +2,14 @@ import puppeteer from 'puppeteer'
 import { writeFile } from 'fs/promises'
 import path from 'path'
 import { pathToFileURL } from 'url'
-import { Command, Option } from 'commander'
+import { Command } from 'commander'
 import packageJson from '../package.json' with { type: 'json' }
 import {
   buildPreviewHTML,
+  buildProbeGroups,
   deriveAppearance,
   mapThemeVariables,
   resolveLightDark,
-  resolveProbeSelector,
-  resolveThemeType,
-  selectVariableNames,
-  THEME_TYPES,
-  type ThemeType,
   type ThemeVariableManifest
 } from './palette.ts'
 
@@ -28,18 +24,11 @@ program
     'Force the UI appearance ("light" or "dark"); defaults to the theme\'s declared appearance'
   )
   .option('-o, --output <path>', 'Output file path (default: ./palette.json)', './palette.json')
-  .addOption(
-    new Option(
-      '-t, --type <type>',
-      'Force the theme type whose variables to extract; defaults to the theme package\'s "theme" field'
-    ).choices([...THEME_TYPES])
-  )
   .parse(process.argv)
 
 const options = program.opts()
 const outputPath = options.output as string
 const appearance = options.appearance as 'light' | 'dark' | undefined
-const type = options.type as ThemeType | undefined
 
 const baseStyleSheetSpecifiers = [
   '@inkdropapp/css/reset.css',
@@ -53,6 +42,25 @@ const baseStyleSheetSpecifiers = [
   '@inkdropapp/base-ui-theme/styles/theme.css'
 ]
 
+/**
+ * Reads every `--*` custom property off an element's computed style. This runs
+ * in the page context (it is handed to `page.$eval`), so it must not reference
+ * any Node-side scope.
+ *
+ * @param element - The element to read the computed custom properties from.
+ * @returns A record of `--custom-property -> computed value`.
+ */
+function readCustomProperties(element: Element): Record<string, string> {
+  const computedStyles = element.computedStyleMap()
+  const variables: Record<string, string> = {}
+  for (const [prop, val] of computedStyles) {
+    if (prop.startsWith('--')) {
+      variables[prop] = val.toString()
+    }
+  }
+  return variables
+}
+
 async function extractPalette(outputPath: string) {
   const themePackageJson = (
     await import(path.join(process.cwd(), 'package.json'), { with: { type: 'json' } })
@@ -60,8 +68,7 @@ async function extractPalette(outputPath: string) {
   const themeVariableManifest: ThemeVariableManifest = (
     await import(`@inkdropapp/css/variables.json`, { with: { type: 'json' } })
   ).default
-  const resolvedType = resolveThemeType(type, themePackageJson)
-  const themeVariableNames = selectVariableNames(themeVariableManifest, resolvedType)
+  const probeGroups = buildProbeGroups(themeVariableManifest)
 
   const browser = await puppeteer.launch({ args: ['--no-sandbox'] })
   const page = await browser.newPage()
@@ -74,10 +81,7 @@ async function extractPalette(outputPath: string) {
     })
     .on('pageerror', (error) => console.error(error instanceof Error ? error.message : error))
 
-  // Fall back to the theme's declared appearance so `light-dark()` resolves to
-  // the branch the theme actually ships, even when no --appearance is forced.
   const resolvedAppearance = appearance ?? deriveAppearance(themePackageJson)
-
   const baseUrl = pathToFileURL(process.cwd()).toString() + '/'
   const baseStyleSheetURLs = baseStyleSheetSpecifiers.map((spec) => import.meta.resolve(spec))
   const content = buildPreviewHTML(
@@ -86,38 +90,24 @@ async function extractPalette(outputPath: string) {
     baseStyleSheetURLs,
     resolvedAppearance
   )
-
   await page.goto(baseUrl)
   await page.setContent(content)
 
-  // Syntax/preview tokens are scoped under `.cm-editor` / `.mde-preview`, so read
-  // the computed variables off the element that carries this theme type's values.
-  const probeSelector = resolveProbeSelector(resolvedType)
-  const computedCSSVariables = await page.$eval(probeSelector, (element) => {
-    const computedStyles = element.computedStyleMap()
-    const variables: Record<string, string> = {}
-    for (const [prop, val] of computedStyles) {
-      if (prop.startsWith('--')) {
-        variables[prop] = val.toString()
-      }
-    }
-    return variables
-  })
-
-  const themeCSSVariables = mapThemeVariables(themeVariableNames, computedCSSVariables)
-
-  // Resolve `light-dark()` to raw values so non-CSS consumers (e.g. the mobile
-  // app's React Native renderer) don't have to evaluate it themselves.
+  const groupedVariables = await Promise.all(
+    probeGroups.map(async ({ probeSelector, variableNames }) => {
+      const computed = await page.$eval(probeSelector, readCustomProperties)
+      return mapThemeVariables(variableNames, computed)
+    })
+  )
+  const themeCSSVariables: Record<string, string> = Object.assign({}, ...groupedVariables)
   const resolvedVariables = Object.fromEntries(
     Object.entries(themeCSSVariables).map(([name, value]) => [
       name,
       typeof value === 'string' ? resolveLightDark(value, resolvedAppearance) : value
     ])
   )
-
   const outputFilePath = path.resolve(outputPath)
   await writeFile(outputFilePath, JSON.stringify(resolvedVariables, null, 2))
-
   await browser.close()
 }
 

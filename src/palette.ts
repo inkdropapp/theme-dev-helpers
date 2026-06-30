@@ -12,8 +12,12 @@ export interface ThemePackage {
   /** Explicit appearance declared by the theme (`"light"` | `"dark"`). */
   themeAppearance?: ThemeAppearance
   styleSheets?: string[]
-  /** Theme type declared by the package (`"ui"` | `"syntax"` | `"preview"`). */
-  theme?: string
+  /**
+   * Marks the package as a unified theme. A theme styles the UI, the editor,
+   * and the Markdown preview at once, so this is a boolean flag rather than the
+   * old per-surface `"ui"` | `"syntax"` | `"preview"` string.
+   */
+  theme?: boolean
 }
 
 /**
@@ -34,7 +38,7 @@ export function deriveAppearance(theme: ThemePackage): ThemeAppearance {
  * compute a theme's CSS custom properties.
  *
  * It pulls in Inkdrop's base CSS plus the theme's own stylesheets so that the
- * computed style of the probed element (see {@link resolveProbeSelector})
+ * computed style of the probed element (see {@link THEME_TYPE_PROBE_SELECTORS})
  * resolves every themed variable. Inkdrop's base stylesheets are passed in as
  * already-resolved absolute URLs (they live in this package's own dependencies,
  * not the theme's), while the theme's own `styles/` links stay relative and
@@ -46,7 +50,7 @@ export function deriveAppearance(theme: ThemePackage): ThemeAppearance {
  * markdown's under `.mde-preview`, and a theme may override them there (e.g.
  * Solarized re-maps the `--hsl-*` ramp under `.cm-editor, .mde-preview
  * .codeblock`), so those variables resolve to the theme's values inside the
- * matching element. See {@link resolveProbeSelector}.
+ * matching element. See {@link THEME_TYPE_PROBE_SELECTORS}.
  *
  * @param theme - The theme package's metadata (`name`, `styleSheets`).
  * @param baseUrl - File URL used as the document `<base href>`; the theme's own
@@ -95,7 +99,10 @@ export function buildPreviewHTML(
  */
 export type ThemeVariableManifest = Record<string, string[]>
 
-/** The theme types `generate-palette` can extract variables for. */
+/**
+ * The surfaces a unified theme styles. `generate-palette` extracts every
+ * surface's variables in a single run and merges them into one palette.
+ */
 export const THEME_TYPES = ['ui', 'syntax', 'preview'] as const
 
 export type ThemeType = (typeof THEME_TYPES)[number]
@@ -141,45 +148,34 @@ const THEME_TYPE_PROBE_SELECTORS: Record<ThemeType, string> = {
   preview: '.mde-preview'
 }
 
-/**
- * Resolves the selector of the element to read a theme type's computed CSS
- * variables from in the preview document built by {@link buildPreviewHTML}.
- *
- * @param type - The theme type being extracted.
- * @returns A CSS selector matching an element in the preview document.
- */
-export function resolveProbeSelector(type: ThemeType): string {
-  return THEME_TYPE_PROBE_SELECTORS[type]
-}
-
-/** Whether `value` is one of the known theme types. */
-function isThemeType(value: string): value is ThemeType {
-  return (THEME_TYPES as readonly string[]).includes(value)
+/** A surface's variable names paired with the element to read them off. */
+export interface ProbeGroup {
+  /** The surface (theme type) this group covers. */
+  type: ThemeType
+  /** The selector whose computed style carries this group's variables. */
+  probeSelector: string
+  /** The group's CSS variable names, in declaration order. */
+  variableNames: string[]
 }
 
 /**
- * Resolves which theme type's variables to extract. A forced type (the
- * `--type` flag) wins; otherwise the theme's declared `theme` field is used.
+ * Builds the extraction plan for a unified theme: each surface's variable names
+ * paired with the element they must be read off. A unified theme styles the UI,
+ * the editor, and the preview at once, and each surface's tokens are scoped
+ * under a different element (see {@link THEME_TYPE_PROBE_SELECTORS}), so every group
+ * is extracted from its own probe element and the results are merged into a
+ * single palette.
  *
- * @param forced - The theme type forced on the CLI, if any.
- * @param theme - The theme package's metadata.
- * @returns The resolved theme type.
- * @throws If no type is forced and the package's `theme` field is missing or
- *   not one of the known theme types.
+ * @param manifest - The categorised manifest shipped by `@inkdropapp/css`.
+ * @returns One {@link ProbeGroup} per surface, in `ui`, `syntax`, `preview`
+ *   order — the merge order of the final palette.
  */
-export function resolveThemeType(forced: ThemeType | undefined, theme: ThemePackage): ThemeType {
-  if (forced) return forced
-  if (theme.theme === undefined) {
-    throw new Error(
-      `The theme package has no "theme" field; pass --type to specify one of: ${THEME_TYPES.join(', ')}.`
-    )
-  }
-  if (!isThemeType(theme.theme)) {
-    throw new Error(
-      `The theme package's "theme" field is "${theme.theme}", not a known theme type; pass --type to specify one of: ${THEME_TYPES.join(', ')}.`
-    )
-  }
-  return theme.theme
+export function buildProbeGroups(manifest: ThemeVariableManifest): ProbeGroup[] {
+  return THEME_TYPES.map((type) => ({
+    type,
+    probeSelector: THEME_TYPE_PROBE_SELECTORS[type],
+    variableNames: selectVariableNames(manifest, type)
+  }))
 }
 
 /**

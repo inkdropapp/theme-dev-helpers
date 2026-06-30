@@ -16,7 +16,15 @@ npm install --save-dev @inkdropapp/theme-dev-helpers
 
 ## Generate Palette
 
-It extracts computed values of theme-related CSS variables from CSS files, and outputs to the specified path.
+It extracts the computed values of a theme's CSS variables and writes them to the specified path.
+
+A theme is unified — it styles the app UI, the editor syntax, and the Markdown preview at once — so a single run extracts every surface's variables and merges them into one `palette.json`:
+
+- the app chrome plus the note status, tags, and task-progress palettes,
+- the editor syntax highlighting tokens, and
+- the rendered Markdown preview.
+
+Each surface's tokens are read off the element they are scoped under (the document body, `.cm-editor`, and `.mde-preview` respectively).
 
 ```sh
 generate-palette [options] <theme-name>
@@ -26,12 +34,8 @@ generate-palette [options] <theme-name>
 
 You can specify the following options:
 
-- `-a, --appearance <light/dark>`: Force the UI appearance ("light" or "dark")
+- `-a, --appearance <light/dark>`: Force the UI appearance ("light" or "dark"). Defaults to the theme's declared appearance.
 - `-o, --output`: The file path where the extracted variables will be saved (default: `./palette.json`).
-- `-t, --type <type>`: Force the theme type whose variables to extract. Defaults to the theme package's `"theme"` field. One of:
-  - `ui`: app chrome plus the note status, tags, and task-progress palettes
-  - `syntax`: editor syntax highlighting tokens
-  - `preview`: the rendered Markdown preview
 
 ### Example
 
@@ -39,12 +43,6 @@ If your theme package name doesn't include 'dark' but it is a dark mode:
 
 ```sh
 generate-palette -a dark
-```
-
-To extract the syntax highlighting variables instead of the UI ones:
-
-```sh
-generate-palette -t syntax
 ```
 
 ## Run dev server
