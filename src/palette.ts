@@ -111,12 +111,13 @@ export type ThemeType = (typeof THEME_TYPES)[number]
  * Manifest categories contributed by each theme type. A `ui` theme covers the
  * app chrome (`ui`) plus the note `status`, `tags`, and `task-progress`
  * palettes; a `syntax` theme covers the editor `syntax` tokens; a `preview`
- * theme covers the rendered `markdown` preview.
+ * theme covers the rendered `markdown` preview plus its `mermaid` diagram
+ * colours.
  */
 const THEME_TYPE_CATEGORIES: Record<ThemeType, string[]> = {
   ui: ['ui', 'status', 'tags', 'task-progress'],
   syntax: ['syntax'],
-  preview: ['markdown']
+  preview: ['markdown', 'mermaid']
 }
 
 /**

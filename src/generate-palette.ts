@@ -39,6 +39,7 @@ const baseStyleSheetSpecifiers = [
   '@inkdropapp/css/task-progress.css',
   '@inkdropapp/css/syntax.css',
   '@inkdropapp/css/markdown.css',
+  '@inkdropapp/css/mermaid.css',
   '@inkdropapp/base-ui-theme/styles/theme.css'
 ]
 

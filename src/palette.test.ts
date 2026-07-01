@@ -121,6 +121,7 @@ describe('selectVariableNames', () => {
     tags: ['--tag-red-text-color'],
     'task-progress': ['--task-progress-view-border-color'],
     markdown: ['--gfm-alert-note'],
+    mermaid: ['--mermaid-text-color'],
     syntax: ['--syntax-comment-color']
   }
 
@@ -138,8 +139,11 @@ describe('selectVariableNames', () => {
     expect(selectVariableNames(manifest, 'syntax')).toEqual(['--syntax-comment-color'])
   })
 
-  test('preview covers only the markdown category', () => {
-    expect(selectVariableNames(manifest, 'preview')).toEqual(['--gfm-alert-note'])
+  test('preview covers the markdown and mermaid categories in declaration order', () => {
+    expect(selectVariableNames(manifest, 'preview')).toEqual([
+      '--gfm-alert-note',
+      '--mermaid-text-color'
+    ])
   })
 
   test('skips categories absent from the manifest', () => {
@@ -154,6 +158,7 @@ describe('buildProbeGroups', () => {
     tags: ['--tag-red-text-color'],
     'task-progress': ['--task-progress-view-border-color'],
     markdown: ['--gfm-alert-note'],
+    mermaid: ['--mermaid-text-color'],
     syntax: ['--syntax-comment-color']
   }
 
@@ -183,7 +188,7 @@ describe('buildProbeGroups', () => {
       '--task-progress-view-border-color'
     ])
     expect(namesByType.syntax).toEqual(['--syntax-comment-color'])
-    expect(namesByType.preview).toEqual(['--gfm-alert-note'])
+    expect(namesByType.preview).toEqual(['--gfm-alert-note', '--mermaid-text-color'])
   })
 })
 
