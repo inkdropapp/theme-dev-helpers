@@ -64,7 +64,7 @@ function readCustomProperties(element: Element): Record<string, string> {
 
 async function extractPalette(outputPath: string) {
   const themePackageJson = (
-    await import(path.join(process.cwd(), 'package.json'), { with: { type: 'json' } })
+    await import(pathToFileURL(path.join(process.cwd(), 'package.json')).toString(), { with: { type: 'json' } })
   ).default
   const themeVariableManifest: ThemeVariableManifest = (
     await import(`@inkdropapp/css/variables.json`, { with: { type: 'json' } })
