@@ -15,7 +15,9 @@ const themeAppearance = import.meta.env.THEME_APPEARANCE
 const baseProjectPath = import.meta.env.BASE_PROJECT_PATH || ''
 const styleSheets: string[] = import.meta.env.STYLE_SHEETS || []
 
-const cssFiles = styleSheets.map((ss) => `${baseProjectPath}/styles/${ss}`)
+const normalizedBase = baseProjectPath.replace(/\\/g, '/')
+const fsBase = normalizedBase.startsWith('/') ? normalizedBase : `/${normalizedBase}`
+const cssFiles = styleSheets.map((ss) => `/@fs${fsBase}/styles/${ss}`)
 
 cssFiles.forEach((file) => {
   import(/* @vite-ignore */ file)
