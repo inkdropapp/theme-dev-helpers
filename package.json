@@ -35,24 +35,24 @@
   },
   "dependencies": {
     "@inkdropapp/base-ui-theme": "^0.7.7",
-    "@inkdropapp/css": "^0.9.10",
-    "@vitejs/plugin-react": "^6.0.5",
+    "@inkdropapp/css": "^0.9.11",
+    "@vitejs/plugin-react": "^6.1.0",
     "commander": "^15.0.0",
-    "puppeteer": "^25.5.0",
+    "puppeteer": "^25.8.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-router-dom": "^7.18.2",
     "typescript": "^7.0.2",
-    "vite": "^8.2.1"
+    "vite": "^8.2.2"
   },
   "devDependencies": {
-    "@types/node": "^26.2.0",
+    "@types/node": "^26.3.0",
     "@types/react": "^19.2.18",
-    "@types/react-dom": "^19.2.4",
-    "oxfmt": "0.62.0",
-    "oxlint": "1.77.0",
+    "@types/react-dom": "^19.2.5",
+    "oxfmt": "0.65.0",
+    "oxlint": "1.80.0",
     "tsdown": "^0.22.14",
-    "vitest": "^4.1.10"
+    "vitest": "^4.1.11"
   },
   "engines": {
     "node": ">=24"
