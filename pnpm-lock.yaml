@@ -12,8 +12,8 @@ importers:
         specifier: ^0.7.7
         version: 0.7.7
       '@inkdropapp/css':
-        specifier: ^0.9.11
-        version: 0.9.11
+        specifier: ^0.9.12
+        version: 0.9.12
       '@vitejs/plugin-react':
         specifier: ^6.1.1
         version: 6.1.1(vite@8.3.0(@types/node@26.5.1))
@@ -66,8 +66,8 @@ packages:
   '@inkdropapp/base-ui-theme@0.7.7':
     resolution: {integrity: sha512-ZdqrcyhtSuBSuqeXkhTRdtRDWXdwknFj4rKDdoLkbmgpDolb2YZJP9GelQLb7gMAk6W/LCuXLe4UUIrd/12SgQ==}
 
-  '@inkdropapp/css@0.9.11':
-    resolution: {integrity: sha512-1aRGE6urJStVfTmRMYDyRoMz95ZSXDYaMWit/HZHpnLkEElIKQyU3NmIRUGUe1DF0nvwiy1u5Qagr69vSPBOEw==}
+  '@inkdropapp/css@0.9.12':
+    resolution: {integrity: sha512-T7qDEe7mtjoYYZFR6eORV5cSGS6FSWLSoArl46lBVI1dEArFLSEauA4zQgWP1kV66HABqQKXQ+m9Cc3lxgOiEw==}
 
   '@jridgewell/resolve-uri@3.1.2':
     resolution: {integrity: sha512-bRISgCIjP20/tbWSPWMEi54QVPRZExkuD9lJL+UIxUKtwVJA8wW1Trb1jMs1RFXo1CBTNZ/5hpC9QvmKWdopKw==}
@@ -1305,7 +1305,7 @@ snapshots:
 
   '@inkdropapp/base-ui-theme@0.7.7': {}
 
-  '@inkdropapp/css@0.9.11':
+  '@inkdropapp/css@0.9.12':
     optionalDependencies:
       inkdrop-model: 2.13.1
 
