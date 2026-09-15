@@ -33,6 +33,7 @@ const appearance = options.appearance as 'light' | 'dark' | undefined
 const baseStyleSheetSpecifiers = [
   '@inkdropapp/css/reset.css',
   '@inkdropapp/css/tokens.css',
+  '@inkdropapp/css/utilities.css',
   '@inkdropapp/css/ui.css',
   '@inkdropapp/css/tags.css',
   '@inkdropapp/css/status.css',
