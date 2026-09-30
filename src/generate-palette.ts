@@ -8,7 +8,10 @@ import {
   buildPreviewHTML,
   buildProbeGroups,
   deriveAppearance,
+  findColorMixCalls,
+  formatSRGBColor,
   mapThemeVariables,
+  replaceColorMix,
   resolveLightDark,
   type ThemeVariableManifest
 } from './palette.ts'
@@ -63,9 +66,35 @@ function readCustomProperties(element: Element): Record<string, string> {
   return variables
 }
 
+/**
+ * Lets the browser evaluate each `color-mix()` call, returning its computed
+ * colour in sRGB (`color(srgb …)`). Wrapping the call in relative colour syntax
+ * converts mixes in any colour space to sRGB. Invalid calls are omitted. This
+ * runs in the page context (it is handed to `page.evaluate`), so it must not
+ * reference any Node-side scope.
+ *
+ * @param calls - `color-mix(…)` expressions with `var()` and `light-dark()`
+ *   already resolved.
+ * @returns A record of `color-mix(…) -> computed sRGB colour`.
+ */
+function computeColorMixes(calls: string[]): Record<string, string> {
+  const probe = document.createElement('div')
+  document.body.appendChild(probe)
+  const computed: Record<string, string> = {}
+  for (const call of calls) {
+    if (!CSS.supports('color', call)) continue
+    probe.style.color = `rgb(from ${call} r g b / alpha)`
+    computed[call] = getComputedStyle(probe).color
+  }
+  probe.remove()
+  return computed
+}
+
 async function extractPalette(outputPath: string) {
   const themePackageJson = (
-    await import(pathToFileURL(path.join(process.cwd(), 'package.json')).toString(), { with: { type: 'json' } })
+    await import(pathToFileURL(path.join(process.cwd(), 'package.json')).toString(), {
+      with: { type: 'json' }
+    })
   ).default
   const themeVariableManifest: ThemeVariableManifest = (
     await import(`@inkdropapp/css/variables.json`, { with: { type: 'json' } })
@@ -108,8 +137,27 @@ async function extractPalette(outputPath: string) {
       typeof value === 'string' ? resolveLightDark(value, resolvedAppearance) : value
     ])
   )
+
+  // Inkdrop mobile can't evaluate color-mix() either, so mix in the browser.
+  const colorMixCalls = [
+    ...new Set(Object.values(resolvedVariables).flatMap((value) => findColorMixCalls(value ?? '')))
+  ]
+  const computedMixes = await page.evaluate(computeColorMixes, colorMixCalls)
+  const mixedColors: Record<string, string> = {}
+  for (const call of colorMixCalls) {
+    const formatted = computedMixes[call] && formatSRGBColor(computedMixes[call])
+    if (formatted) mixedColors[call] = formatted
+    else console.warn(`Could not resolve ${call}; leaving it as is`)
+  }
+  const mixedVariables = Object.fromEntries(
+    Object.entries(resolvedVariables).map(([name, value]) => [
+      name,
+      typeof value === 'string' ? replaceColorMix(value, mixedColors) : value
+    ])
+  )
+
   const outputFilePath = path.resolve(outputPath)
-  await writeFile(outputFilePath, JSON.stringify(resolvedVariables, null, 2))
+  await writeFile(outputFilePath, JSON.stringify(mixedVariables, null, 2))
   await browser.close()
 }
 

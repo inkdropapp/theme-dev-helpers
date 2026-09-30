@@ -261,3 +261,77 @@ export function resolveLightDark(value: string, appearance: ThemeAppearance): st
     resolveLightDark(value.slice(close + 1), appearance)
   )
 }
+
+/**
+ * Finds every outermost `color-mix(…)` call in a CSS value, in source order.
+ * Nested calls are part of their enclosing call and are not listed separately,
+ * since the browser resolves the whole expression at once. Unbalanced calls are
+ * skipped.
+ *
+ * @param value - A CSS value that may contain `color-mix()` calls.
+ * @returns The full text of each outermost `color-mix(…)` call.
+ */
+export function findColorMixCalls(value: string): string[] {
+  const marker = 'color-mix('
+  const calls: string[] = []
+  let from = 0
+  for (let start = value.indexOf(marker); start !== -1; start = value.indexOf(marker, from)) {
+    const close = matchingParen(value, start + marker.length - 1)
+    if (close === -1) break
+    calls.push(value.slice(start, close + 1))
+    from = close + 1
+  }
+  return calls
+}
+
+/**
+ * Replaces every outermost `color-mix(…)` call in a CSS value with its resolved
+ * colour. Calls missing from `resolved` (e.g. ones the browser rejected) are left
+ * as they are.
+ *
+ * Like `light-dark()`, the browser leaves `color-mix()` unevaluated inside
+ * custom properties, and Inkdrop's mobile app can't evaluate it either, so the
+ * palette must carry the mixed result. The mixing itself happens in the
+ * headless browser (see {@link findColorMixCalls}); this only splices the
+ * results back in, so mixes embedded in larger values (shadows, borders) work.
+ *
+ * @param value - A CSS value that may contain `color-mix()` calls.
+ * @param resolved - Map of `color-mix(…)` call text to its resolved colour.
+ * @returns The value with each resolvable call replaced.
+ */
+export function replaceColorMix(value: string, resolved: Record<string, string>): string {
+  return findColorMixCalls(value).reduce(
+    (acc, call) => (resolved[call] === undefined ? acc : acc.replace(call, resolved[call])),
+    value
+  )
+}
+
+/** Clamps `n` into `[0, 1]`. */
+const clamp01 = (n: number) => Math.min(1, Math.max(0, n))
+
+/**
+ * Converts a browser-computed sRGB colour — `color(srgb r g b)` or
+ * `color(srgb r g b / a)`, as Chrome serialises `rgb(from <color> r g b / alpha)`
+ * — into `#rrggbb`, or `rgba(r, g, b, a)` when translucent. Channels outside
+ * the sRGB gamut (e.g. from an `oklch` mix) are clamped. `none` counts as 0.
+ *
+ * @param computed - The computed colour string.
+ * @returns The formatted colour, or `undefined` if `computed` isn't an sRGB
+ *   `color()` value.
+ */
+export function formatSRGBColor(computed: string): string | undefined {
+  const match = /^color\(srgb\s+([^)]*)\)$/.exec(computed.trim())
+  if (!match) return undefined
+  const [channels, alphaPart] = match[1].split('/')
+  const parse = (token: string) => (token === 'none' ? 0 : Number(token))
+  const rgb = channels.trim().split(/\s+/).map(parse)
+  const alpha = alphaPart === undefined ? 1 : parse(alphaPart.trim())
+  if (rgb.length !== 3 || [...rgb, alpha].some(Number.isNaN)) return undefined
+
+  const [r, g, b] = rgb.map((c) => Math.round(clamp01(c) * 255))
+  const a = Math.round(clamp01(alpha) * 1000) / 1000
+  if (a === 1) {
+    return '#' + [r, g, b].map((c) => c.toString(16).padStart(2, '0')).join('')
+  }
+  return `rgba(${r}, ${g}, ${b}, ${a})`
+}

@@ -3,7 +3,10 @@ import {
   buildPreviewHTML,
   buildProbeGroups,
   deriveAppearance,
+  findColorMixCalls,
+  formatSRGBColor,
   mapThemeVariables,
+  replaceColorMix,
   resolveLightDark,
   selectVariableNames
 } from './palette'
@@ -111,6 +114,71 @@ describe('resolveLightDark', () => {
     const value = 'light-dark(a, b), light-dark(c, d)'
     expect(resolveLightDark(value, 'light')).toBe('a, c')
     expect(resolveLightDark(value, 'dark')).toBe('b, d')
+  })
+})
+
+describe('findColorMixCalls', () => {
+  test('returns nothing for values without color-mix', () => {
+    expect(findColorMixCalls('hsl(192deg 100% 5%)')).toEqual([])
+  })
+
+  test('finds a call embedded in a larger value', () => {
+    const value = '0 1px 2px color-mix(in srgb, hsl(200deg 50% 50%) 20%, white) inset'
+    expect(findColorMixCalls(value)).toEqual(['color-mix(in srgb, hsl(200deg 50% 50%) 20%, white)'])
+  })
+
+  test('lists only the outermost call when calls are nested', () => {
+    const value = 'color-mix(in srgb, color-mix(in srgb, red, blue), white)'
+    expect(findColorMixCalls(value)).toEqual([value])
+  })
+
+  test('finds multiple sibling calls in order', () => {
+    const value = 'color-mix(in srgb, red, white), color-mix(in oklab, blue, black)'
+    expect(findColorMixCalls(value)).toEqual([
+      'color-mix(in srgb, red, white)',
+      'color-mix(in oklab, blue, black)'
+    ])
+  })
+
+  test('skips an unbalanced call', () => {
+    expect(findColorMixCalls('color-mix(in srgb, red, white')).toEqual([])
+  })
+})
+
+describe('replaceColorMix', () => {
+  test('splices resolved colours in place of their calls', () => {
+    const value = '1px solid color-mix(in srgb, red, white)'
+    expect(replaceColorMix(value, { 'color-mix(in srgb, red, white)': '#ff8080' })).toBe(
+      '1px solid #ff8080'
+    )
+  })
+
+  test('leaves unresolved calls untouched', () => {
+    const value = 'color-mix(in srgb, bogus, white)'
+    expect(replaceColorMix(value, {})).toBe(value)
+  })
+})
+
+describe('formatSRGBColor', () => {
+  test('formats an opaque colour as hex', () => {
+    expect(formatSRGBColor('color(srgb 0.3 0 0.7)')).toBe('#4d00b3')
+  })
+
+  test('formats a translucent colour as rgba', () => {
+    expect(formatSRGBColor('color(srgb 1 1 1 / 0.2)')).toBe('rgba(255, 255, 255, 0.2)')
+  })
+
+  test('clamps out-of-gamut channels', () => {
+    expect(formatSRGBColor('color(srgb -0.3 1.2 0.5)')).toBe('#00ff80')
+  })
+
+  test('treats none as zero', () => {
+    expect(formatSRGBColor('color(srgb none 1 none)')).toBe('#00ff00')
+  })
+
+  test('rejects values that are not sRGB color()', () => {
+    expect(formatSRGBColor('rgb(0, 0, 0)')).toBeUndefined()
+    expect(formatSRGBColor('color(display-p3 1 0 0)')).toBeUndefined()
   })
 })
 
