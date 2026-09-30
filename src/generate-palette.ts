@@ -156,8 +156,15 @@ async function extractPalette(outputPath: string) {
     ])
   )
 
+  // Metadata keys don't start with `--`, so they can't collide with variables.
+  const palette = {
+    themeDevHelpersVersion: packageJson.version,
+    name: themePackageJson.name,
+    themeAppearance: themePackageJson.themeAppearance,
+    ...mixedVariables
+  }
   const outputFilePath = path.resolve(outputPath)
-  await writeFile(outputFilePath, JSON.stringify(mixedVariables, null, 2))
+  await writeFile(outputFilePath, JSON.stringify(palette, null, 2))
   await browser.close()
 }
 
