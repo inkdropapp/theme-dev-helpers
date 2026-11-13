@@ -1,3 +1,6 @@
+> [!IMPORTANT]
+> This repository has moved to [inkdropapp/plugins](https://github.com/inkdropapp/plugins): [`libs/theme-dev-helpers`](https://github.com/inkdropapp/plugins/tree/main/libs/theme-dev-helpers). It is archived and read-only; please open issues and pull requests there.
+
 # Theme dev helpers
 
 A helper module for creating themes for Inkdrop.
